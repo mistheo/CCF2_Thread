@@ -1,5 +1,5 @@
 #include <pthread.h>
-#include <semaphore.h>
+#include <semaphore.h>	
 #include <wiringPi.h>
 #include <iostream>
 using namespace std;
@@ -32,11 +32,19 @@ int main(int argc, char *argv []){
 	//  - paramètre 3 : le nom de la fonction thread
 	//  - paramètre 4 : un paramètre passé à la fonction thread
 			
-	int ret = pthread_create(&thBoutons, NULL, thread_gestion_boutons, pointeurs);
-	if (ret)
+	int ret_bt = pthread_create(&thBoutons, NULL, thread_gestion_boutons, pointeurs);
+	if (ret_bt)
 	{
-		cout << "Error - pthread_create() return code : " << ret << endl;
+		cout << "Error - pthread_create() pour les boutons return code : " << ret_bt << endl;
 	}
+
+	int ret_cl = pthread_create(&thClavier, NULL, thread_gestion_clavier, (void*)pointeurs);
+	if (ret_cl)
+	{
+		cout << "Error - pthread_create() pour le clavier return code : " << ret_cl << endl;
+	}
+
+
 	cout << "Vous pouvez aussi modifier son fonctionnement avec le clavier:\n";
 	cout << "touche 1: plus rapide - limite 50 msec\n";
 	cout << "touche 2: plus lent - limite 5000 msec\n";
@@ -50,6 +58,7 @@ int main(int argc, char *argv []){
 	int monsens=1;
 	do 
 	{
+			monsens = DonneesPartagees.litSens();
 			mavitesse = DonneesPartagees.litVitesse();
 			maPiface.AllumerLed(numLed);
 			delay(mavitesse);
@@ -58,10 +67,11 @@ int main(int argc, char *argv []){
 				numLed = (numLed == 8) ? 1 : numLed + monsens;
 			else
 				numLed = (numLed == 1) ? 8 : numLed + monsens;
+			
 	} while (DonneesPartagees.litFin()!=true);
 	
-	pthread_join(thBoutons, NULL);    // on attend que le thread des boutons soit arrêté
 	pthread_join(thClavier, NULL); // on attend la fin du thread clavier
+	pthread_join(thBoutons, NULL);  // on attend que le thread des boutons soit arrêté
 	
 	return 0;
 }
