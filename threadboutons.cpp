@@ -34,7 +34,6 @@ void* thread_gestion_boutons(void* data)
 		case 3:	ptrDonneesPartagees->changeSens();
 				cout << "on change de sens ";
 			cout << ((ptrDonneesPartagees->litSens() == 1 )? "Gauche" : "Droite") << endl;
-			break;
 		case 4:	cout << "on arrête le chenillard PAR LE BOUTON 4\n";
 			ptrDonneesPartagees->setFin(true);
 		}
